@@ -1,9 +1,12 @@
 package com.example.nailradom;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Mask implements Parcelable{
+public class Mask implements Parcelable {
 
     private int ID;
     private String Name;

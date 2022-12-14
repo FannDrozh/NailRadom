@@ -5,19 +5,27 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.jar.Attributes;
 
 public class FinalNail extends AppCompatActivity {
@@ -25,6 +33,7 @@ public class FinalNail extends AppCompatActivity {
     ImageView Photo;
     TextView NameNail,PriceNail;
     Mask mask;
+    Button RandBut1;
     Connection connection;
     View v;
     String image = "";
@@ -34,20 +43,11 @@ public class FinalNail extends AppCompatActivity {
         setContentView(R.layout.activity_final_nail);
 
         mask=getIntent().getParcelableExtra("NailRandom");
-
-        Photo = findViewById(R.id.Photo);
-
-        NameNail = findViewById(R.id.NameNail);
-        NameNail.setText(mask.getName());
-
-        PriceNail = findViewById(R.id.PriceNail);
-        PriceNail.setText(mask.getPrice());
-
-        Photo.setImageBitmap(getImgBitmap(mask.getImage()));
         v = findViewById(com.google.android.material.R.id.ghost_view);
+
     }
 
-    private Bitmap getImgBitmap(String encodedImg) {
+    /*private Bitmap getImgBitmap(String encodedImg) {
         if(encodedImg!=null&& !encodedImg.equals("null")) {
             byte[] bytes = new byte[0];
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -71,6 +71,10 @@ public class FinalNail extends AppCompatActivity {
             return image;
         }
         return "";
+    }*/
+    public void run() {
+        Intent intent = new Intent( FinalNail.this, FinalNail.class);
+        startActivity(intent);
     }
 
     public void ClickReset(View v)
@@ -83,15 +87,34 @@ public class FinalNail extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         try {
-                            String query="";
+                            String query = "SELECT TOP 1 Name_Design, Price FROM Design_Nail ORDER BY NEWID()";
+                            String name_design = "";
+                            int price = 0;
                             ConSQL connectionHelper = new ConSQL();
                             connection = connectionHelper.conclass();
-                            if (connection != null)
-                            {
-                                query = "SELECT TOP 1 Name_Design = '" + NameNail.getText() + "', Price = '" + PriceNail.getText() + "', Image ='" + image + "' FROM Design_Nail ORDER BY NEWID()";
+                            if (connection != null) {
                                 Statement statement = connection.createStatement();
-                                Toast.makeText(FinalNail.this, "Данные изменены", Toast.LENGTH_SHORT).show();
-                                statement.executeQuery(query);
+                                ResultSet resultSet = statement.executeQuery(query);
+                                while (resultSet.next()){
+                                    name_design = resultSet.getString("Name_Design");
+                                    price = resultSet.getInt("Price");
+                                    //image = resultSet.getString("Image");
+                                }
+
+                                if(name_design == null)
+                                {
+                                    Toast.makeText(FinalNail.this, "Данные не найдены", Toast.LENGTH_SHORT).show();
+
+                                }
+                                else{
+
+                                    NameNail.setText(name_design);
+                                    PriceNail.setText(price);
+                                    Toast.makeText(FinalNail.this, "Данные изменены", Toast.LENGTH_SHORT).show();
+                                }
+
+
+
                             }
                         }
                         catch (Exception ex)
@@ -106,8 +129,10 @@ public class FinalNail extends AppCompatActivity {
                         dialogInterface.cancel();
                     }
                 });
+
         AlertDialog dialog=builder.create();
         dialog.show();
     }
+
 
 }
