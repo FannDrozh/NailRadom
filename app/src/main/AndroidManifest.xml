@@ -15,6 +15,13 @@
         android:theme="@style/Theme.NailRadom"
         tools:targetApi="31">
         <activity
+            android:name=".FinalNail"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".SettingsNail"
             android:exported="false">
             <meta-data

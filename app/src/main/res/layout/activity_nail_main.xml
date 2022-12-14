@@ -4,18 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/Fon"
+    android:background="@drawable/fon"
     tools:context=".NailMain">
 
-    <ImageView
+
+    <ImageButton
         android:id="@+id/Filtr"
         android:layout_width="129dp"
         android:layout_height="112dp"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#00FFFFFF"
+        android:cropToPadding="false"
+        android:onClick="Clickfiltr"
+        app:layout_constraintEnd_toEndOf="@+id/imageFilterView"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/imageFilterView"
+        app:layout_constraintTop_toTopOf="@+id/imageFilterView" />
+
+    <ImageView
+        android:id="@+id/imageFilterView"
+        android:layout_width="130dp"
+        android:layout_height="112dp"
+        android:background="@drawable/filtr"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/Фильтр" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView3"
