@@ -8,10 +8,10 @@ import android.os.Parcelable;
 
 public class Mask implements Parcelable {
 
-    private int ID;
-    private String Name;
-    private String Price;
-    private String Image;
+    public int ID;
+    public String Name;
+    public String Price;
+    public String Image;
 
     protected Mask(Parcel in){
         ID = in.readInt();

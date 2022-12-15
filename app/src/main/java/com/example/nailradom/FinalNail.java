@@ -1,16 +1,24 @@
 package com.example.nailradom;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,6 +27,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,10 +40,14 @@ import java.util.jar.Attributes;
 
 public class FinalNail extends AppCompatActivity {
 
+    private Context nContext;
     ImageView Photo;
+    List<Mask> data = new ArrayList<Mask>();
+    ListView listView;
+    Adapter pAdapter;
     TextView NameNail,PriceNail;
     Mask mask;
-    Button RandBut1;
+    Button button;
     Connection connection;
     View v;
     String image = "";
@@ -43,38 +57,87 @@ public class FinalNail extends AppCompatActivity {
         setContentView(R.layout.activity_final_nail);
 
         mask=getIntent().getParcelableExtra("NailRandom");
+        NameNail =findViewById(R.id.NameNail);
+        PriceNail = findViewById(R.id.PriceNail);
+        Photo = findViewById(R.id.Photo);
+
         v = findViewById(com.google.android.material.R.id.ghost_view);
 
     }
+    private void selectImage() {
+        // clear previous data
+        NameNail.setText("");
+        Photo.setImageBitmap(null);
+        // Initialize intent
+        Intent intent=new Intent(Intent.ACTION_PICK);
+        // set type
+        intent.setType("image/*");
+        // start activity result
+        startActivityForResult(Intent.createChooser(intent,"Select Image"),100);
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull  int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-    /*private Bitmap getImgBitmap(String encodedImg) {
-        if(encodedImg!=null&& !encodedImg.equals("null")) {
-            byte[] bytes = new byte[0];
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                bytes = Base64.getDecoder().decode(encodedImg);
-            }
-            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+        // check condition
+        if (requestCode==100 && grantResults[0]== PackageManager.PERMISSION_GRANTED)
+        {
+            // when permission
+            // is granted
+            // call method
+            selectImage();
         }
-        return BitmapFactory.decodeResource(FinalNail.this.getResources(),
-                R.drawable.logo);
+        else
+        {
+            // when permission is denied
+            Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public void enterMobile() {
+        pAdapter.notifyDataSetInvalidated();
+        listView.setAdapter(pAdapter);
     }
 
-    private String encodeImage(Bitmap bitmap) {
-        int prevW = 150;
-        int prevH = bitmap.getHeight() * prevW / bitmap.getWidth();
-        Bitmap b = Bitmap.createScaledBitmap(bitmap, prevW, prevH, false);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        b.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
-        byte[] bytes = byteArrayOutputStream.toByteArray();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            image=Base64.getEncoder().encodeToString(bytes);
-            return image;
+    public void SelectList(String Choice)
+    {
+        data = new ArrayList<Mask>();
+        listView = findViewById(R.id.BD);
+        pAdapter = new Adapter(MainActivity.this, data);
+        try {
+            ConSQL connectionHelper = new ConSQL();
+            connection = connectionHelper.conclass();
+            if (connection != null) {
+
+                String query = Choice;
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(query);
+
+                while (resultSet.next()) {
+                    Mask tempMask = new Mask
+                            (resultSet.getInt("ID_Nail"),
+                                    resultSet.getString("Name_Design"),
+                                    resultSet.getString("Price"),
+                                    resultSet.getString("Image")
+
+                            );
+                    data.add(tempMask);
+                    pAdapter.notifyDataSetInvalidated();
+                }
+                connection.close();
+            } else {
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
-        return "";
-    }*/
-    public void run() {
-        Intent intent = new Intent( FinalNail.this, FinalNail.class);
-        startActivity(intent);
+        enterMobile();
+    }
+
+    private void getImage()
+    {
+        Intent intentChooser= new Intent();
+        intentChooser.setType("image/*");
+        intentChooser.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intentChooser,1);
     }
 
     public void ClickReset(View v)
@@ -89,7 +152,8 @@ public class FinalNail extends AppCompatActivity {
                         try {
                             String query = "SELECT TOP 1 Name_Design, Price FROM Design_Nail ORDER BY NEWID()";
                             String name_design = "";
-                            int price = 0;
+                            String price = "";
+                            String img = "";
                             ConSQL connectionHelper = new ConSQL();
                             connection = connectionHelper.conclass();
                             if (connection != null) {
@@ -97,20 +161,37 @@ public class FinalNail extends AppCompatActivity {
                                 ResultSet resultSet = statement.executeQuery(query);
                                 while (resultSet.next()){
                                     name_design = resultSet.getString("Name_Design");
-                                    price = resultSet.getInt("Price");
-                                    //image = resultSet.getString("Image");
+                                    price = resultSet.getString("Price");
+                                    image = resultSet.("Image");
                                 }
 
                                 if(name_design == null)
                                 {
-                                    Toast.makeText(FinalNail.this, "Данные не найдены", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(FinalNail.this, "Данные name не найдены", Toast.LENGTH_SHORT).show();
 
                                 }
                                 else{
-
-                                    NameNail.setText(name_design);
-                                    PriceNail.setText(price);
-                                    Toast.makeText(FinalNail.this, "Данные изменены", Toast.LENGTH_SHORT).show();
+                                    if(price == null)
+                                    {
+                                        Toast.makeText(FinalNail.this, "Данные price не найдены", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else
+                                    {
+                                        NameNail.setText(name_design);
+                                        PriceNail.setText(price);
+                                        button.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                // decode base64 string
+                                                byte[] bytes= Base64.getDecoder().decode(image);
+                                                // Initialize bitmap
+                                                Bitmap bitmap= BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+                                                // set bitmap on imageView
+                                                Photo.setImageBitmap(bitmap);
+                                            }
+                                        });
+                                        Toast.makeText(FinalNail.this, "Данные изменены", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
 
 
