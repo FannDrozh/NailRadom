@@ -30,14 +30,14 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".SettingsNail"
+            android:name=".NailMain"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".NailMain"
+            android:name=".SettingsNail"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
