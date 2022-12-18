@@ -1,7 +1,6 @@
 package com.example.nailradom;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,16 +8,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.Image;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -26,9 +18,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,15 +25,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.jar.Attributes;
 
 public class FinalNail extends AppCompatActivity {
 
-    private Context nContext;
+
     ImageView Photo;
-    List<Mask> data = new ArrayList<Mask>();
-    ListView listView;
-    Adapter pAdapter;
     TextView NameNail,PriceNail;
     Mask mask;
     Button button;
@@ -61,7 +46,7 @@ public class FinalNail extends AppCompatActivity {
         PriceNail = findViewById(R.id.PriceNail);
         Photo = findViewById(R.id.Photo);
 
-        v = findViewById(com.google.android.material.R.id.ghost_view);
+        //v = findViewById(com.google.android.material.R.id.ghost_view);
 
     }
     private void selectImage() {
@@ -93,51 +78,15 @@ public class FinalNail extends AppCompatActivity {
             Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
         }
     }
-    public void enterMobile() {
-        pAdapter.notifyDataSetInvalidated();
-        listView.setAdapter(pAdapter);
-    }
+    public ImageView MyDisign (String image){
 
-    public void SelectList(String Choice)
-    {
-        data = new ArrayList<Mask>();
-        listView = findViewById(R.id.BD);
-        pAdapter = new Adapter(MainActivity.this, data);
-        try {
-            ConSQL connectionHelper = new ConSQL();
-            connection = connectionHelper.conclass();
-            if (connection != null) {
-
-                String query = Choice;
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(query);
-
-                while (resultSet.next()) {
-                    Mask tempMask = new Mask
-                            (resultSet.getInt("ID_Nail"),
-                                    resultSet.getString("Name_Design"),
-                                    resultSet.getString("Price"),
-                                    resultSet.getString("Image")
-
-                            );
-                    data.add(tempMask);
-                    pAdapter.notifyDataSetInvalidated();
-                }
-                connection.close();
-            } else {
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        enterMobile();
-    }
-
-    private void getImage()
-    {
-        Intent intentChooser= new Intent();
-        intentChooser.setType("image/*");
-        intentChooser.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intentChooser,1);
+                // decode base64 string
+                byte[] bytes= Base64.getDecoder().decode(image);
+                // Initialize bitmap
+                Bitmap bitmap= BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+                // set bitmap on imageView
+                Photo.setImageBitmap(bitmap);
+        return Photo;
     }
 
     public void ClickReset(View v)
@@ -150,7 +99,7 @@ public class FinalNail extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         try {
-                            String query = "SELECT TOP 1 Name_Design, Price FROM Design_Nail ORDER BY NEWID()";
+                            String query = "SELECT TOP 1 Name_Design, Price, Image FROM Design_Nail ORDER BY NEWID()";
                             String name_design = "";
                             String price = "";
                             String img = "";
@@ -162,7 +111,7 @@ public class FinalNail extends AppCompatActivity {
                                 while (resultSet.next()){
                                     name_design = resultSet.getString("Name_Design");
                                     price = resultSet.getString("Price");
-                                    image = resultSet.("Image");
+                                    img = resultSet.getString("Image");
                                 }
 
                                 if(name_design == null)
@@ -179,17 +128,8 @@ public class FinalNail extends AppCompatActivity {
                                     {
                                         NameNail.setText(name_design);
                                         PriceNail.setText(price);
-                                        button.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                // decode base64 string
-                                                byte[] bytes= Base64.getDecoder().decode(image);
-                                                // Initialize bitmap
-                                                Bitmap bitmap= BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-                                                // set bitmap on imageView
-                                                Photo.setImageBitmap(bitmap);
-                                            }
-                                        });
+                                        image = img;
+                                        MyDisign(image);
                                         Toast.makeText(FinalNail.this, "Данные изменены", Toast.LENGTH_SHORT).show();
                                     }
                                 }

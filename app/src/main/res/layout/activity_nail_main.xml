@@ -10,31 +10,31 @@
 
     <ImageButton
         android:id="@+id/Filtr"
-        android:layout_width="129dp"
-        android:layout_height="112dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="196dp"
+        android:layout_height="436dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="107dp"
+        android:layout_marginTop="146dp"
+        android:layout_marginEnd="108dp"
+        android:layout_marginBottom="149dp"
         android:backgroundTint="#00FFFFFF"
         android:cropToPadding="false"
         android:onClick="Clickfiltr"
-        app:layout_constraintEnd_toEndOf="@+id/imageFilterView"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/imageFilterView"
-        app:layout_constraintTop_toTopOf="@+id/imageFilterView" />
-
-    <ImageView
-        android:id="@+id/imageFilterView"
-        android:layout_width="130dp"
-        android:layout_height="112dp"
-        android:background="@drawable/filtr"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/imageNail"
+        app:layout_constraintVertical_bias="0.615" />
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="90dp"
         android:fontFamily="cursive"
         android:text="Nail Random"
         android:textSize="48sp"
@@ -42,5 +42,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageNail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/nail1"
+        tools:layout_editor_absoluteX="-44dp"
+        tools:layout_editor_absoluteY="-71dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
